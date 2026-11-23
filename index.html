@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PustakaKu - Sistem Perpustakaan & Peminjaman Buku Online</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- ================= HEADER / NAVIGASI UTAMA ================= -->
+  <header class="main-header">
+    <div class="header-container">
+      <!-- Logo & Nama Situs -->
+      <div class="site-branding" onclick="navigateToTab('catalog')" style="cursor: pointer;">
+        <div class="logo-box">
+          <i class="fa-solid fa-book-open-reader"></i>
+        </div>
+        <div>
+          <h1 class="site-title">Pustaka<span>Ku</span></h1>
+          <p class="site-subtitle">Perpustakaan Umum Digital</p>
+        </div>
+      </div>
+
+      <!-- Menu Utama (Sederhana & Mudah Dipahami) -->
+      <nav class="primary-nav">
+        <button class="nav-btn active" id="navBtnCatalog" onclick="navigateToTab('catalog')">
+          <i class="fa-solid fa-magnifying-glass"></i> Cari Buku
+        </button>
+        <button class="nav-btn user-only" id="navBtnMyLoans" onclick="navigateToTab('my-loans')">
+          <i class="fa-solid fa-clipboard-check"></i> Pesanan & Pinjaman Saya 
+          <span class="bubble-badge" id="badgeMyLoans">0</span>
+        </button>
+      </nav>
+
+      <!-- Bagian Akun Pengguna -->
+      <div class="header-actions">
+        <!-- Kotak Akun Pengguna -->
+        <div class="user-pill" id="userPill" style="cursor: default;">
+          <div class="user-avatar-circle" id="pillAvatar">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <div class="user-pill-text">
+            <span class="user-pill-name" id="pillName">Anggota</span>
+            <span class="user-pill-sub" id="pillSub">Nomor Anggota</span>
+          </div>
+        </div>
+
+        <!-- Tombol Keluar (Logout) -->
+        <button class="btn-portal-switch" onclick="logoutUser()" title="Keluar dari akun dan kembali ke halaman login">
+          <i class="fa-solid fa-right-from-bracket"></i> <span>Keluar</span>
+        </button>
+      </div>
+    </div>
+  </header>
+  <!-- ================= KONTEN UTAMA ================= -->
+  <main class="content-container">
+
+    <!-- ================= HALAMAN 1: KATALOG BUKU ================= -->
+    <section id="view-catalog" class="page-view active">
+      
+      <!-- Kotak Pencarian Buku Super Jelas -->
+      <div class="search-hero">
+        <h2>Pencarian Katalog Buku</h2>
+        <p class="search-desc">Ketikkan judul buku, nama pengarang/penulis, atau topik yang ingin Anda pinjam.</p>
+        
+        <div class="search-bar-box">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="opacSearchInput" placeholder="Contoh: Laskar Pelangi, Filosofi Teras, Clean Code, Sapiens, Bisnis..." autocomplete="off">
+          <button class="btn-clear-search" id="btnClearSearch" onclick="clearOpacSearch()" style="display:none;">
+            <i class="fa-solid fa-circle-xmark"></i> Hapus
+          </button>
+        </div>
+
+        <!-- Filter Kategori Buku (Tombol Besar & Mudah Dipencet) -->
+        <div class="category-pills" id="categoryPills">
+          <button class="cat-pill active" onclick="setCategoryFilter('all')">Semua Kategori</button>
+          <button class="cat-pill" onclick="setCategoryFilter('Sastra & Fiksi')">Sastra & Fiksi</button>
+          <button class="cat-pill" onclick="setCategoryFilter('Pengembangan Diri')">Pengembangan Diri</button>
+          <button class="cat-pill" onclick="setCategoryFilter('Bisnis & Finansial')">Bisnis & Finansial</button>
+          <button class="cat-pill" onclick="setCategoryFilter('Teknologi & Komputer')">Teknologi & Komputer</button>
+          <button class="cat-pill" onclick="setCategoryFilter('Sains & Pengetahuan')">Sains & Pengetahuan</button>
+        </div>
+      </div>
+
+      <!-- Informasi Hasil & Filter Ketersediaan -->
+      <div class="catalog-toolbar">
+        <div>
+          <h3 id="catalogResultHeading">Koleksi Buku Perpustakaan</h3>
+          <p id="catalogResultCount" class="text-muted">Menampilkan seluruh koleksi buku perpustakaan</p>
+        </div>
+        <div class="availability-toggle-group">
+          <button class="toggle-btn active" id="btnFilterAll" onclick="setAvailabilityFilter('all')">Semua</button>
+          <button class="toggle-btn" id="btnFilterAvailable" onclick="setAvailabilityFilter('available')">
+            <i class="fa-solid fa-circle-check text-green"></i> Tersedia Saja
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid Buku (Tampilan Besar, Jelas & Ramah Pengguna) -->
+      <div class="books-display-grid" id="booksGrid">
+        <!-- Data buku di-generate via JavaScript -->
+      </div>
+    </section>
+
+
+    <!-- ================= HALAMAN 2: PESANAN & PEMINJAMAN SAYA ================= -->
+    <section id="view-my-loans" class="page-view">
+      <div class="page-header">
+        <div>
+          <h2>Pesanan & Peminjaman Buku Saya</h2>
+          <p class="page-subtitle" id="userGreetingText">Pantau status pesanan, jadwal pengambilan, dan tanggal pengembalian buku Anda di sini.</p>
+        </div>
+      </div>
+
+      <!-- Ringkasan Status Simpel -->
+      <div class="summary-cards-row">
+        <div class="summary-card">
+          <div class="summary-icon orange"><i class="fa-solid fa-hourglass-half"></i></div>
+          <div>
+            <span class="summary-title">Menunggu ACC Petugas</span>
+            <strong class="summary-num" id="userCountPending">0</strong>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon blue"><i class="fa-solid fa-box-open"></i></div>
+          <div>
+            <span class="summary-title">Siap Diambil di Loket</span>
+            <strong class="summary-num" id="userCountReady">0</strong>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon green"><i class="fa-solid fa-book-bookmark"></i></div>
+          <div>
+            <span class="summary-title">Sedang Dipinjam</span>
+            <strong class="summary-num" id="userCountActive">0</strong>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-icon red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div>
+            <span class="summary-title">Denda Keterlambatan</span>
+            <strong class="summary-num" id="userCountFine">Rp 0</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Banner Peringatan Denda Keterlambatan -->
+      <div id="userFineAlertBanner" class="user-fine-alert-banner" style="display: none;"></div>
+
+      <!-- Filter Tabs Pinjaman Saya -->
+      <div class="loans-filter-bar" style="margin-bottom: 1.25rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button type="button" class="loan-filter-btn active" data-filter="all" onclick="setUserLoanFilter('all')">
+          Semua (<span id="filterCountAll">0</span>)
+        </button>
+        <button type="button" class="loan-filter-btn" data-filter="pending" onclick="setUserLoanFilter('pending')">
+          <i class="fa-solid fa-hourglass-half"></i> Menunggu ACC (<span id="filterCountPending">0</span>)
+        </button>
+        <button type="button" class="loan-filter-btn" data-filter="ready" onclick="setUserLoanFilter('ready')">
+          <i class="fa-solid fa-box-open"></i> Siap Diambil (<span id="filterCountReady">0</span>)
+        </button>
+        <button type="button" class="loan-filter-btn" data-filter="borrowed" onclick="setUserLoanFilter('borrowed')">
+          <i class="fa-solid fa-book-bookmark"></i> Sedang Dipinjam (<span id="filterCountBorrowed">0</span>)
+        </button>
+        <button type="button" class="loan-filter-btn" data-filter="overdue" onclick="setUserLoanFilter('overdue')">
+          <i class="fa-solid fa-triangle-exclamation"></i> Terlambat / Denda (<span id="filterCountOverdue">0</span>)
+        </button>
+        <button type="button" class="loan-filter-btn" data-filter="returned" onclick="setUserLoanFilter('returned')">
+          <i class="fa-solid fa-circle-check"></i> Selesai (<span id="filterCountReturned">0</span>)
+        </button>
+      </div>
+
+      <!-- Daftar Kartu Pesanan Pengguna -->
+      <div id="userLoansContainer" class="loan-cards-list">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+
+    <!-- Admin section removed — admin portal is now separate (admin.html) -->
+
+  </main>
+
+  <!-- ================= MODAL DIALOGS ================= -->
+
+  <!-- Login modal removed — login is now handled via login.html -->
+
+
+  <!-- MODAL 2: PEMESANAN BUKU / BOOKING (ALUR 4) -->
+  <div class="modal-backdrop" id="bookingModal">
+    <div class="modal-card">
+      <div class="modal-top">
+        <div>
+          <h3 class="modal-title">Formulir Pemesanan Buku (Booking)</h3>
+          <p class="modal-subtitle">Tentukan lokasi pengambilan dan durasi peminjaman buku Anda.</p>
+        </div>
+        <button class="btn-close-modal" onclick="closeModal('bookingModal')">&times;</button>
+      </div>
+
+      <form id="bookingForm" onsubmit="handleBookingSubmit(event)">
+        <input type="hidden" id="bookingBookId">
+
+        <!-- Info Buku Yang Dipilih -->
+        <div class="selected-book-summary" id="selectedBookSummary">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Info Anggota Terdeteksi -->
+        <div class="member-detected-badge" id="memberDetectedBadge">
+          <i class="fa-solid fa-circle-user member-icon"></i>
+          <div>
+            <small>Peminjam Terdaftar:</small>
+            <strong id="bookingMemberName">-</strong>
+            <span id="bookingMemberId" class="member-sub">-</span>
+          </div>
+        </div>
+
+        <!-- Pilihan Lokasi / Metode Pengambilan (Alur 4) -->
+        <div class="form-field" style="margin-top: 1.25rem;">
+          <label class="form-label">Pilih Lokasi & Metode Pengambilan Buku: <span class="req">*</span></label>
+          <div class="pickup-options-grid">
+            <label class="pickup-card active">
+              <input type="radio" name="pickupMethod" value="Loket Sirkulasi (Lantai 1)" checked>
+              <div class="pickup-card-content">
+                <i class="fa-solid fa-building-columns"></i>
+                <strong>Loket Sirkulasi Perpustakaan</strong>
+                <span>Ambil di meja petugas Lantai 1 (Jam 08.00 - 16.00)</span>
+              </div>
+            </label>
+            <label class="pickup-card">
+              <input type="radio" name="pickupMethod" value="Smart Locker (24 Jam)">
+              <div class="pickup-card-content">
+                <i class="fa-solid fa-box-archive"></i>
+                <strong>Smart Locker Mandiri (24 Jam)</strong>
+                <span>Ambil kapan saja dengan tap kartu anggota / scan QR</span>
+                <span style="display:inline-flex; align-items:center; gap:0.3rem; color:#2563eb; font-weight:700; font-size:0.75rem; margin-top:0.35rem; background:#eff6ff; padding:0.2rem 0.55rem; border-radius:4px; width:fit-content; border:1px solid #bfdbfe;">
+                  <i class="fa-solid fa-qrcode"></i> Dilengkapi QR Code Akses Pintu
+                </span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Jumlah Buku Yang Ingin Dipinjam & Durasi -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-field">
+            <label class="form-label">Jumlah Eksemplar Buku:</label>
+            <div class="qty-control-wrapper">
+              <button type="button" class="btn-qty" onclick="changeBookingQty(-1)">-</button>
+              <input type="number" id="bookingQty" value="1" min="1" max="5" readonly class="input-qty">
+              <button type="button" class="btn-qty" onclick="changeBookingQty(1)">+</button>
+            </div>
+            <small style="font-size:0.75rem; color:var(--text-muted); display:block; margin-top:0.25rem;">Maksimal 3 eksemplar per peminjaman</small>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Durasi Peminjaman:</label>
+            <select id="bookingDuration" class="input-lg" onchange="updateEstimatedDue()">
+              <option value="7" selected>7 Hari (Standar)</option>
+              <option value="14">14 Hari (Penelitian)</option>
+              <option value="3">3 Hari (Baca Cepat)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="info-alert-box">
+          <i class="fa-solid fa-circle-info"></i>
+          <div>
+            <strong>Pemberitahuan:</strong>
+            <p>Setelah pesanan disetujui petugas (ACC), buku wajib diambil maksimal <strong>2 × 24 jam</strong> sebelum pemesanan otomatis dibatalkan.</p>
+          </div>
+        </div>
+
+        <div class="modal-actions-footer">
+          <button type="button" class="btn-cancel" onclick="closeModal('bookingModal')">Batal</button>
+          <button type="submit" class="btn-submit-lg">
+            <i class="fa-solid fa-check"></i> Konfirmasi & Kirim Pesanan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- MODAL 3: BUKTI PEMESANAN / TIKET PENGAMBILAN (ALUR 5 & 6) -->
+  <div class="modal-backdrop" id="ticketModal">
+    <div class="modal-card">
+      <div class="modal-top">
+        <div>
+          <h3 class="modal-title">Bukti Pemesanan Buku</h3>
+          <p class="modal-subtitle">Tunjukkan bukti ini kepada petugas perpustakaan atau di Smart Locker.</p>
+        </div>
+        <button class="btn-close-modal" onclick="closeModal('ticketModal')">&times;</button>
+      </div>
+
+      <div class="ticket-body" id="ticketContent">
+        <!-- Rendered via JS -->
+      </div>
+
+      <div class="modal-actions-footer">
+        <button type="button" class="btn-submit-lg" onclick="closeModal('ticketModal'); navigateToTab('my-loans');">
+          <i class="fa-solid fa-check"></i> Mengerti, Lihat Status Saya
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MODAL 4: DETAIL BUKU -->
+  <div class="modal-backdrop" id="bookDetailModal">
+    <div class="modal-card">
+      <div class="modal-top">
+        <h3 class="modal-title" id="bookDetailTitle">Detail Buku</h3>
+        <button class="btn-close-modal" onclick="closeModal('bookDetailModal')">&times;</button>
+      </div>
+      <div class="modal-content-body" id="bookDetailBody">
+        <!-- Populated via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: PEMBAYARAN DENDA VIA QRIS -->
+  <div class="modal-backdrop" id="finePaymentModal">
+    <div class="modal-card" style="max-width: 440px; text-align: center;">
+      <div class="modal-top">
+        <div>
+          <h3 class="modal-title"><i class="fa-solid fa-qrcode" style="color:var(--primary); margin-right:0.35rem;"></i> Bayar Denda via QRIS</h3>
+          <p class="modal-subtitle">Pelunasan denda keterlambatan buku secara non-tunai (cashless).</p>
+        </div>
+        <button class="btn-close-modal" onclick="closeModal('finePaymentModal')">&times;</button>
+      </div>
+
+      <div class="modal-content-body" style="padding: 1.25rem 0.5rem;">
+        <!-- Ringkasan Denda -->
+        <div style="background: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 10px; padding: 0.9rem; margin-bottom: 1rem;">
+          <span style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: #9f1239; letter-spacing: 0.5px; display: block;">Total Tagihan Denda</span>
+          <div id="fineModalAmount" style="font-size: 1.85rem; font-weight: 800; color: #e11d48; margin: 0.2rem 0;">Rp 0</div>
+          <div id="fineModalDetail" style="font-size: 0.85rem; color: #475569;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Tampilan QRIS -->
+        <div style="padding: 12px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 18px rgba(0,0,0,0.08); display: inline-block; border: 1.5px solid #e2e8f0; max-width: 210px; margin-bottom: 0.85rem;">
+          <img src="qr-locker.jpg" alt="QRIS Pembayaran Denda PustakaKu" style="width: 100%; height: auto; max-height: 250px; object-fit: contain; display: block; border-radius: 6px;">
+          <div style="font-size: 0.75rem; color: #475569; margin-top: 0.45rem; font-weight: 700; display:flex; align-items:center; justify-content:center; gap:0.35rem;">
+            <i class="fa-solid fa-qrcode" style="color:var(--primary);"></i> Scan via m-Banking / e-Wallet
+          </div>
+        </div>
+
+        <div style="font-size: 0.8rem; color: #475569; text-align: left; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.75rem 0.9rem; line-height: 1.45;">
+          <strong><i class="fa-solid fa-circle-info" style="color:var(--primary);"></i> Cara Pembayaran:</strong>
+          <ol style="margin-left: 1.2rem; margin-top: 0.25rem;">
+            <li>Scan QRIS di atas dengan BCA Mobile, GoPay, Dana, OVO, atau ShopeePay.</li>
+            <li>Bayar sesuai nominal tagihan denda di atas.</li>
+            <li>Setelah berhasil, klik tombol konfirmasi di bawah ini.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="modal-actions-footer" style="display:flex; gap:0.75rem; justify-content:center;">
+        <button type="button" class="btn-cancel" onclick="closeModal('finePaymentModal')">Tutup</button>
+        <button type="button" class="btn-submit-lg" id="btnConfirmFinePayment" style="background:#16a34a; border-color:#16a34a; width:auto;">
+          <i class="fa-solid fa-circle-check"></i> Konfirmasi Pembayaran Selesai
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 6: KONFIRMASI BATALKAN PESANAN -->
+  <div class="modal-backdrop" id="cancelBookingModal">
+    <div class="modal-card" style="max-width: 440px; text-align: center; padding: 2rem 1.5rem;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: inline-flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0 auto 1rem;">
+        <i class="fa-solid fa-ban"></i>
+      </div>
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: #1e293b; margin-bottom: 0.5rem;">Batalkan Pesanan Buku?</h3>
+      <p id="cancelBookingModalTitle" style="font-weight: 700; color: #0f172a; font-size: 1rem; margin-bottom: 0.5rem;"></p>
+      <p style="font-size: 0.88rem; color: #64748b; line-height: 1.45; margin-bottom: 1.25rem;">
+        Permohonan peminjaman ini akan dibatalkan dan kuota buku akan segera dikembalikan ke rak katalog perpustakaan.
+      </p>
+      <div style="display: flex; gap: 0.75rem; justify-content: center;">
+        <button type="button" class="btn-cancel" style="padding: 0.65rem 1.4rem; font-weight: 600;" onclick="closeModal('cancelBookingModal')">
+          Tidak, Kembali
+        </button>
+        <button type="button" id="btnConfirmCancelBooking" class="btn-reject" style="background: #dc2626; border-color: #dc2626; color: #fff; padding: 0.65rem 1.4rem; font-weight: 700; border-radius: 8px; cursor: pointer;">
+          <i class="fa-solid fa-check"></i> Ya, Batalkan Pesanan
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Add book modal removed — admin features moved to admin.html -->
+
+  <!-- TOAST NOTIFIKASI -->
+  <div class="toast-wrapper" id="toastWrapper"></div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <i class="fa-solid fa-book-open-reader"></i>
+        <strong>PustakaKu</strong>
+        <span>Perpustakaan Umum</span>
+      </div>
+      <p class="footer-copyright">&copy; 2026 PustakaKu.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

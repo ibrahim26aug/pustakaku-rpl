@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masuk - PustakaKu Perpustakaan Digital</title>
+  <meta name="description" content="Halaman login PustakaKu - Sistem Perpustakaan & Peminjaman Buku Online. Masuk sebagai anggota atau petugas perpustakaan.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --admin-primary: #0f172a;
+      --surface: #ffffff;
+      --bg: #f0f4f8;
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem 1rem;
+      position: relative;
+      overflow-y: auto; /* Memastikan bisa di-scroll jika layar laptop/HP pendek */
+    }
+
+    /* Ambient background blobs yang halus */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.22;
+      z-index: 0;
+      pointer-events: none;
+    }
+    body::before {
+      width: 400px; height: 400px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      top: -100px; left: -80px;
+    }
+    body::after {
+      width: 360px; height: 360px;
+      background: linear-gradient(135deg, #06b6d4, #2563eb);
+      bottom: -80px; right: -60px;
+    }
+
+    .login-wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 430px;
+      margin: auto;
+    }
+
+    /* Brand header ringkas & proporsional */
+    .brand-header {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .brand-logo-box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+      color: #fff;
+      font-size: 1.35rem;
+      margin-bottom: 0.45rem;
+      box-shadow: 0 6px 20px rgba(37,99,235,0.28);
+    }
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .brand-title span { color: var(--primary); }
+    .brand-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    /* Login card ringkas dan pas di layar */
+    .login-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 1.25rem 1.4rem;
+      border: 1px solid var(--border);
+    }
+
+    /* Portal selector tabs */
+    .portal-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .portal-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.7rem 0.5rem;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: #f8fafc;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      color: var(--text-muted);
+    }
+    .portal-tab i {
+      font-size: 1.15rem;
+      transition: transform 0.2s;
+    }
+    .portal-tab .portal-tab-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .portal-tab .portal-tab-desc {
+      font-size: 0.72rem;
+      text-align: center;
+      line-height: 1.2;
+    }
+    .portal-tab:hover {
+      border-color: var(--primary);
+      background: #eff6ff;
+    }
+    .portal-tab.active-member {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      color: var(--primary-dark);
+      box-shadow: 0 2px 10px rgba(37,99,235,0.12);
+    }
+    .portal-tab.active-admin {
+      border-color: var(--admin-primary);
+      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+      color: var(--admin-primary);
+      box-shadow: 0 2px 10px rgba(15,23,42,0.12);
+    }
+
+    /* Sub-header status panel */
+    .portal-panel-title {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.8rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed var(--border);
+    }
+    .portal-panel-title i {
+      color: var(--primary);
+      font-size: 0.85rem;
+    }
+    .portal-panel-title.admin-badge i {
+      color: var(--admin-primary);
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 0.85rem;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.3rem;
+    }
+    .form-label .req { color: #ef4444; }
+    .input-field {
+      width: 100%;
+      padding: 0.65rem 0.85rem 0.65rem 2.4rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      color: var(--text-dark);
+      background: #f8fafc;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+    .input-field::placeholder { color: #94a3b8; }
+    .input-field:focus {
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+    .input-field.admin-focus:focus {
+      border-color: var(--admin-primary);
+      box-shadow: 0 0 0 3px rgba(15,23,42,0.12);
+    }
+
+    .input-icon-wrap {
+      position: relative;
+    }
+    .input-icon-wrap i {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 0.88rem;
+    }
+
+    /* Tombol Login */
+    .btn-login {
+      width: 100%;
+      padding: 0.72rem;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      transition: all 0.2s ease;
+      margin-top: 0.35rem;
+    }
+    .btn-login.member-btn {
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+      color: #fff;
+      box-shadow: 0 3px 12px rgba(37,99,235,0.25);
+    }
+    .btn-login.member-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 18px rgba(37,99,235,0.35);
+    }
+    .btn-login.admin-btn {
+      background: linear-gradient(135deg, var(--admin-primary), #334155);
+      color: #fff;
+      box-shadow: 0 3px 12px rgba(15,23,42,0.25);
+    }
+    .btn-login.admin-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 18px rgba(15,23,42,0.35);
+    }
+
+    /* Register link */
+    .register-section {
+      text-align: center;
+      margin-top: 0.85rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+    .register-section p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .btn-register-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.4rem;
+      padding: 0.45rem 1rem;
+      border: 1.5px solid var(--primary);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--primary);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-register-link:hover {
+      background: var(--primary);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    /* Admin info hint */
+    .admin-info-hint {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.76rem;
+      color: #475569;
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      line-height: 1.35;
+    }
+    .admin-info-hint i {
+      color: var(--admin-primary);
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    /* Error & Success Messages */
+    .error-msg {
+      display: none;
+      padding: 0.55rem 0.8rem;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      color: #b91c1c;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 0.85rem;
+      line-height: 1.35;
+    }
+    .error-msg.show { display: flex; align-items: flex-start; gap: 0.45rem; }
+    .error-msg i { margin-top: 2px; flex-shrink: 0; }
+
+    .success-msg {
+      display: none;
+      padding: 0.55rem 0.8rem;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      color: #15803d;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 0.85rem;
+      line-height: 1.35;
+    }
+    .success-msg.show { display: flex; align-items: flex-start; gap: 0.45rem; }
+    .success-msg i { margin-top: 2px; flex-shrink: 0; }
+
+    /* Footer */
+    .login-footer {
+      text-align: center;
+      margin-top: 0.9rem;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    /* Back button in register form */
+    .btn-back-login {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 0.75rem;
+    }
+    .btn-back-login:hover { text-decoration: underline; }
+
+    .register-overlay { display: none; }
+    .register-overlay.active { display: block; }
+    .login-form-view { display: block; }
+    .login-form-view.hidden { display: none; }
+
+    @media (max-width: 480px) {
+      body { padding: 1rem 0.75rem; }
+      .login-card { padding: 1.1rem; }
+      .brand-title { font-size: 1.5rem; }
+      .portal-tab { padding: 0.6rem 0.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-wrapper">
+    <!-- Brand Header -->
+    <div class="brand-header">
+      <div class="brand-logo-box">
+        <i class="fa-solid fa-book-open-reader"></i>
+      </div>
+      <h1 class="brand-title">Pustaka<span>Ku</span></h1>
+      <p class="brand-subtitle">Sistem Perpustakaan & Peminjaman Buku Online</p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="login-card">
+      <!-- LOGIN VIEW -->
+      <div class="login-form-view" id="loginFormView">
+        
+        <!-- Tab Selector Portal -->
+        <div class="portal-tabs">
+          <button type="button" class="portal-tab active-member" id="portalMemberBtn" onclick="selectPortal('member')">
+            <i class="fa-solid fa-user"></i>
+            <span class="portal-tab-title">Anggota</span>
+            <span class="portal-tab-desc">Pinjam & cari buku</span>
+          </button>
+          <button type="button" class="portal-tab" id="portalAdminBtn" onclick="selectPortal('admin')">
+            <i class="fa-solid fa-user-shield"></i>
+            <span class="portal-tab-title">Petugas</span>
+            <span class="portal-tab-desc">Kelola & ACC pinjaman</span>
+          </button>
+        </div>
+
+        <!-- Global Error Notification -->
+        <div class="error-msg" id="loginErrorMsg">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="loginErrorText">Kredensial tidak valid.</span>
+        </div>
+
+        <!-- ================= PANEL 1: LOGIN ANGGOTA ================= -->
+        <!-- Terpisah secara mandiri sehingga input Anggota tidak tercampur dengan Petugas -->
+        <div id="panelMember" class="portal-panel">
+          <div class="portal-panel-title">
+            <i class="fa-solid fa-user-tag"></i>
+            <span>Masuk ke Akun Anggota Pemustaka</span>
+          </div>
+
+          <form id="formMember" onsubmit="handleMemberLogin(event)">
+            <div class="form-group">
+              <label class="form-label" for="memberId">Nama Lengkap atau Nomor Anggota (NIM) <span class="req">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" id="memberId" class="input-field" placeholder="Masukkan nama lengkap atau NIM Anda" required autocomplete="off">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+                <label class="form-label" for="memberPass" style="margin-bottom:0;">Kata Sandi Anggota <span class="req">*</span></label>
+                <a href="javascript:void(0)" onclick="showForgotPassForm('member')" style="font-size:0.75rem; color:var(--primary); text-decoration:none; font-weight:600;">Lupa kata sandi?</a>
+              </div>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" id="memberPass" class="input-field" placeholder="Masukkan kata sandi Anda" required>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-login member-btn" id="btnMemberSubmit">
+              <i class="fa-solid fa-right-to-bracket"></i> Masuk ke Portal Anggota
+            </button>
+          </form>
+
+          <!-- Registrasi untuk anggota baru -->
+          <div class="register-section">
+            <p>Belum punya akun anggota perpustakaan?</p>
+            <button type="button" class="btn-register-link" onclick="showRegisterForm()">
+              <i class="fa-solid fa-user-plus"></i> Daftar Online Sekarang
+            </button>
+          </div>
+        </div>
+
+        <!-- ================= PANEL 2: LOGIN PETUGAS ================= -->
+        <!-- Form dan input khusus Petugas — tidak akan ikut terbawa ke tab Anggota -->
+        <div id="panelAdmin" class="portal-panel" style="display: none;">
+          <div class="admin-info-hint">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>Akses khusus meja sirkulasi & petugas perpustakaan untuk verifikasi ACC pinjaman.</span>
+          </div>
+
+          <div class="portal-panel-title admin-badge">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>Masuk ke Panel Petugas Sirkulasi</span>
+          </div>
+
+          <form id="formAdmin" onsubmit="handleAdminLogin(event)">
+            <div class="form-group">
+              <label class="form-label" for="adminId">Nama Petugas atau ID Petugas <span class="req">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-user-shield"></i>
+                <input type="text" id="adminId" class="input-field admin-focus" placeholder="Masukkan ID petugas atau nama petugas" required autocomplete="off">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem;">
+                <label class="form-label" for="adminPass" style="margin-bottom:0;">Kata Sandi Petugas <span class="req">*</span></label>
+                <a href="javascript:void(0)" onclick="showForgotPassForm('admin')" style="font-size:0.75rem; color:#475569; text-decoration:none; font-weight:600;">Lupa kata sandi?</a>
+              </div>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" id="adminPass" class="input-field admin-focus" placeholder="Masukkan kata sandi petugas" required>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-login admin-btn" id="btnAdminSubmit">
+              <i class="fa-solid fa-shield"></i> Masuk ke Panel Petugas
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- ================= REGISTER VIEW ================= -->
+      <div class="register-overlay" id="registerFormView">
+        <button type="button" class="btn-back-login" onclick="showLoginForm()">
+          <i class="fa-solid fa-arrow-left"></i> Kembali ke Halaman Login
+        </button>
+
+        <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.15rem; color: var(--text-dark);">Pendaftaran Anggota Baru</h3>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1rem;">Lengkapi data di bawah untuk membuat akun perpustakaan online.</p>
+
+        <!-- Pesan status registrasi -->
+        <div class="success-msg" id="regSuccessMsg">
+          <i class="fa-solid fa-circle-check"></i>
+          <span id="regSuccessText">Pendaftaran berhasil!</span>
+        </div>
+        <div class="error-msg" id="regErrorMsg">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="regErrorText">Error pendaftaran</span>
+        </div>
+
+        <form id="registerForm" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap <span class="req">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-user"></i>
+              <input type="text" id="regName" class="input-field" placeholder="Contoh: Ahmad Hidayat" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nomor Anggota / NIM <span class="req">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-id-card"></i>
+              <input type="text" id="regId" class="input-field" placeholder="Contoh: 2205099" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nomor WhatsApp / HP Aktif <span class="req">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-phone"></i>
+              <input type="tel" id="regPhone" class="input-field" placeholder="Contoh: 0812-3456-7890" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Buat Kata Sandi <span class="req">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-lock"></i>
+              <input type="password" id="regPass" class="input-field" placeholder="Minimal 3 karakter" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-login member-btn" style="margin-top:0.5rem;">
+            <i class="fa-solid fa-user-check"></i> Daftar Sebagai Anggota Baru
+          </button>
+        </form>
+      </div>
+
+      <!-- ================= FORGOT PASSWORD VIEW ================= -->
+      <div class="register-overlay" id="forgotPassView">
+        <button type="button" class="btn-back-login" onclick="showLoginForm()">
+          <i class="fa-solid fa-arrow-left"></i> Kembali ke Halaman Login
+        </button>
+
+        <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 0.15rem; color: var(--text-dark);">
+          <i class="fa-solid fa-key" style="color:var(--primary); margin-right:0.35rem;"></i> Reset Kata Sandi
+        </h3>
+        <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Verifikasi identitas akun Anda dengan Nama / NIM dan Nomor HP terdaftar.
+        </p>
+
+        <!-- Pesan status -->
+        <div class="success-msg" id="forgotSuccessMsg">
+          <i class="fa-solid fa-circle-check"></i>
+          <span id="forgotSuccessText">Kata sandi berhasil diperbarui!</span>
+        </div>
+        <div class="error-msg" id="forgotErrorMsg">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span id="forgotErrorText">Data tidak cocok</span>
+        </div>
+
+        <form id="forgotPassForm" onsubmit="handleForgotPassSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap atau Nomor Anggota (NIM) <span class="req">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-id-card"></i>
+              <input type="text" id="forgotId" class="input-field" placeholder="Contoh: 2205099 atau Ahmad Fikri" required autocomplete="off">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nomor WhatsApp / HP Terdaftar <span class="req">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-phone"></i>
+              <input type="tel" id="forgotPhone" class="input-field" placeholder="Contoh: 0812-9988-7766" required autocomplete="off">
+            </div>
+            <small style="font-size:0.75rem; color:var(--text-muted); display:block; margin-top:0.25rem;">
+              Nomor kontak yang digunakan saat pertama mendaftar anggota
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Buat Kata Sandi Baru <span class="req">*</span></label>
+            <div class="input-icon-wrap">
+              <i class="fa-solid fa-lock"></i>
+              <input type="password" id="forgotNewPass" class="input-field" placeholder="Minimal 3 karakter" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-login member-btn" style="margin-top:0.5rem;">
+            <i class="fa-solid fa-shield-check"></i> Simpan & Perbarui Kata Sandi
+          </button>
+        </form>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:0.65rem 0.8rem; margin-top:0.85rem; font-size:0.75rem; color:#64748b; line-height:1.4;">
+          <i class="fa-solid fa-circle-info" style="color:var(--primary);"></i> Lupa nomor kontak? Silakan hubungi Petugas Sirkulasi di loket perpustakaan untuk reset manual.
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <p>&copy; 2026 PustakaKu — Perpustakaan Digital</p>
+    </div>
+  </div>
+
+  <script>
+    // ===== LocalStorage keys =====
+    const LS_MEMBERS = 'pk_members';
+    const LS_CURRENT = 'pk_current_member';
+
+    // Default members (fallback & demo)
+    const DEFAULT_MEMBERS = [
+      { id: "2205099", name: "Ahmad Fikri", role: "member", phone: "0812-9988-7766", password: "123" },
+      { id: "2205011", name: "Budi Santoso", role: "member", phone: "0812-3456-7890", password: "123" },
+      { id: "2205034", name: "Siti Rahmawati", role: "member", phone: "0813-9876-5432", password: "123" },
+      { id: "2205088", name: "Ahmad Fauzi", role: "member", phone: "0857-1122-3344", password: "123" },
+      { id: "PETUGAS-01", name: "Petugas", role: "admin", phone: "0811-2233-4455", password: "admin" }
+    ];
+
+    let activePortal = 'member';
+
+    function getMembers() {
+      const saved = localStorage.getItem(LS_MEMBERS);
+      let list = saved ? JSON.parse(saved) : [...DEFAULT_MEMBERS];
+      // Pastikan akun demo (termasuk Ahmad Fikri) selalu terdaftar dengan password aktif
+      let modified = false;
+      DEFAULT_MEMBERS.forEach(def => {
+        const existing = list.find(m => m.id.toLowerCase() === def.id.toLowerCase() || m.name.toLowerCase() === def.name.toLowerCase());
+        if (!existing) {
+          list.push({ ...def });
+          modified = true;
+        } else if (!existing.password) {
+          existing.password = def.password;
+          modified = true;
+        }
+      });
+      // Pastikan nama akun admin adalah "Petugas"
+      list.forEach(m => {
+        if (m.role === 'admin' || m.id === 'PETUGAS-01') {
+          if (m.name !== 'Petugas') {
+            m.name = 'Petugas';
+            modified = true;
+          }
+        }
+      });
+      if (modified || !saved) {
+        saveMembers(list);
+      }
+      return list;
+    }
+
+    function saveMembers(members) {
+      localStorage.setItem(LS_MEMBERS, JSON.stringify(members));
+    }
+
+    // Pencari akun cerdas: bisa berdasarkan NAMA LENGKAP, NAMA PANGGILAN, atau ID / NIM
+    function findMember(query, members) {
+      if (!query) return null;
+      const clean = query.trim().toLowerCase();
+      const stripped = clean.replace(/[^a-z0-9]/g, '');
+
+      return members.find(m => {
+        const mIdClean = (m.id || '').toLowerCase();
+        const mIdStripped = mIdClean.replace(/[^a-z0-9]/g, '');
+        const mNameClean = (m.name || '').toLowerCase();
+        const mNameStripped = mNameClean.replace(/[^a-z0-9]/g, '');
+
+        // 1. Cocokkan ID / NIM (persis atau tanpa simbol)
+        if (mIdClean === clean || mIdStripped === stripped) return true;
+
+        // 2. Cocokkan Nama Lengkap persis
+        if (mNameClean === clean || mNameStripped === stripped) return true;
+
+        // 3. Cocokkan jika nama mengandung kata yang diketik (misal "Ahmad Fikri", "Fikri", "Budi")
+        if (clean.length >= 3 && mNameClean.includes(clean)) return true;
+        if (clean.length >= 3 && clean.includes(mNameClean)) return true;
+
+        // 4. Cocokkan nama tanpa gelar/panggilan (Petugas Sirkulasi -> Petugas)
+        const nameWithoutTitle = mNameClean.replace(/\b(ibu|bapak|pak|bu|mas|mba|mbak)\b/gi, '').trim();
+        if (nameWithoutTitle === clean || (clean.length >= 3 && nameWithoutTitle.includes(clean))) return true;
+
+        // 5. Variasi petugas / admin
+        if (m.role === 'admin') {
+          if (clean === 'admin' || clean === 'petugas') return true;
+          const normalizeAdmin = str => str.replace(/^petugas0*/, 'petugas');
+          if (normalizeAdmin(mIdStripped) === normalizeAdmin(stripped)) return true;
+        }
+
+        return false;
+      });
+    }
+
+    // Ganti tab portal: Anggota vs Petugas
+    // Form masing-masing terpisah 100%, sehingga username admin tidak ikut ke form anggota!
+    function selectPortal(portal) {
+      activePortal = portal;
+      const memberBtn = document.getElementById('portalMemberBtn');
+      const adminBtn = document.getElementById('portalAdminBtn');
+      const panelMember = document.getElementById('panelMember');
+      const panelAdmin = document.getElementById('panelAdmin');
+      const errorMsg = document.getElementById('loginErrorMsg');
+
+      // Sembunyikan pesan error saat ganti tab
+      errorMsg.classList.remove('show');
+
+      if (portal === 'member') {
+        memberBtn.className = 'portal-tab active-member';
+        adminBtn.className = 'portal-tab';
+        panelMember.style.display = 'block';
+        panelAdmin.style.display = 'none';
+        document.getElementById('memberId').focus();
+      } else {
+        memberBtn.className = 'portal-tab';
+        adminBtn.className = 'portal-tab active-admin';
+        panelMember.style.display = 'none';
+        panelAdmin.style.display = 'block';
+        document.getElementById('adminId').focus();
+      }
+    }
+
+    function showError(text) {
+      const errorMsg = document.getElementById('loginErrorMsg');
+      const errorText = document.getElementById('loginErrorText');
+      errorText.textContent = text;
+      errorMsg.classList.add('show');
+    }
+
+    function hideError() {
+      document.getElementById('loginErrorMsg').classList.remove('show');
+    }
+
+    // ================= HANDLER LOGIN ANGGOTA =================
+    function handleMemberLogin(e) {
+      e.preventDefault();
+      hideError();
+
+      const inputVal = document.getElementById('memberId').value.trim();
+      const pass = document.getElementById('memberPass').value.trim();
+
+      if (!inputVal || !pass) {
+        showError('Mohon isi Nama / NIM dan Kata Sandi.');
+        return;
+      }
+
+      const members = getMembers();
+      const user = findMember(inputVal, members);
+
+      if (!user) {
+        showError(`Akun "${inputVal}" tidak ditemukan di sistem. Silakan periksa kembali atau daftar akun baru.`);
+        return;
+      }
+
+      // Cegah akun admin masuk lewat portal anggota
+      if (user.role === 'admin') {
+        showError('Akun ini adalah akun Petugas. Silakan klik tab "Petugas" di atas untuk masuk.');
+        return;
+      }
+
+      const expectedPass = String(user.password || '123').trim();
+      if (expectedPass !== pass) {
+        showError('Kata sandi salah. Silakan periksa kembali.');
+        return;
+      }
+
+      // Berhasil login sebagai anggota
+      localStorage.setItem(LS_CURRENT, JSON.stringify(user));
+      localStorage.setItem('pk_last_member', JSON.stringify(user));
+      window.location.href = 'index.html';
+    }
+
+    // ================= HANDLER LOGIN PETUGAS =================
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      hideError();
+
+      const inputVal = document.getElementById('adminId').value.trim();
+      const pass = document.getElementById('adminPass').value.trim();
+
+      if (!inputVal || !pass) {
+        showError('Mohon isi Nama Petugas / ID Petugas dan Kata Sandi.');
+        return;
+      }
+
+      const members = getMembers();
+      const user = findMember(inputVal, members);
+
+      if (!user) {
+        showError('ID atau Nama Petugas tidak ditemukan di sistem.');
+        return;
+      }
+
+      // Cegah akun anggota biasa masuk lewat portal petugas
+      if (user.role !== 'admin') {
+        showError('Akun ini adalah akun Anggota biasa. Silakan klik tab "Anggota" di atas untuk meminjam buku.');
+        return;
+      }
+
+      const expectedAdminPass = String(user.password || 'admin').trim();
+      if (expectedAdminPass !== pass) {
+        showError('Kata sandi petugas salah. Silakan periksa kembali.');
+        return;
+      }
+
+      // Berhasil login sebagai petugas
+      localStorage.setItem(LS_CURRENT, JSON.stringify(user));
+      localStorage.setItem('pk_last_admin', JSON.stringify(user));
+      window.location.href = 'admin.html';
+    }
+
+    // ================= ALUR REGISTRASI ANGGOTA BARU =================
+    function showRegisterForm() {
+      document.getElementById('loginFormView').classList.add('hidden');
+      document.getElementById('registerFormView').classList.add('active');
+      const forgotView = document.getElementById('forgotPassView');
+      if (forgotView) forgotView.classList.remove('active');
+      hideError();
+    }
+
+    function showForgotPassForm(portal = 'member') {
+      document.getElementById('loginFormView').classList.add('hidden');
+      document.getElementById('registerFormView').classList.remove('active');
+      const forgotView = document.getElementById('forgotPassView');
+      if (forgotView) forgotView.classList.add('active');
+      hideError();
+      const inputId = document.getElementById('forgotId');
+      if (inputId) {
+        if (portal === 'admin') {
+          inputId.value = document.getElementById('adminId').value || '';
+        } else {
+          inputId.value = document.getElementById('memberId').value || '';
+        }
+        inputId.focus();
+      }
+    }
+
+    function showLoginForm() {
+      document.getElementById('loginFormView').classList.remove('hidden');
+      document.getElementById('registerFormView').classList.remove('active');
+      const forgotView = document.getElementById('forgotPassView');
+      if (forgotView) forgotView.classList.remove('active');
+      document.getElementById('regErrorMsg').classList.remove('show');
+      document.getElementById('regSuccessMsg').classList.remove('show');
+      const forgotErr = document.getElementById('forgotErrorMsg');
+      if (forgotErr) forgotErr.classList.remove('show');
+      const forgotSucc = document.getElementById('forgotSuccessMsg');
+      if (forgotSucc) forgotSucc.classList.remove('show');
+      selectPortal(activePortal || 'member');
+    }
+
+    function handleForgotPassSubmit(e) {
+      e.preventDefault();
+      const forgotId = document.getElementById('forgotId').value.trim();
+      const forgotPhone = document.getElementById('forgotPhone').value.trim();
+      const newPass = document.getElementById('forgotNewPass').value.trim();
+
+      const errEl = document.getElementById('forgotErrorMsg');
+      const errText = document.getElementById('forgotErrorText');
+      const succEl = document.getElementById('forgotSuccessMsg');
+      const succText = document.getElementById('forgotSuccessText');
+
+      errEl.classList.remove('show');
+      succEl.classList.remove('show');
+
+      if (!forgotId || !forgotPhone || !newPass) {
+        errText.textContent = 'Mohon lengkapi seluruh data verifikasi.';
+        errEl.classList.add('show');
+        return;
+      }
+
+      if (newPass.length < 3) {
+        errText.textContent = 'Kata sandi baru minimal 3 karakter.';
+        errEl.classList.add('show');
+        return;
+      }
+
+      const members = getMembers();
+      const user = findMember(forgotId, members);
+
+      if (!user) {
+        errText.textContent = `Akun "${forgotId}" tidak ditemukan di sistem perpustakaan.`;
+        errEl.classList.add('show');
+        return;
+      }
+
+      // Validasi nomor telepon/HP
+      const cleanInputPhone = forgotPhone.replace(/[^0-9]/g, '');
+      const cleanUserPhone = (user.phone || '').replace(/[^0-9]/g, '');
+
+      if (cleanInputPhone.length >= 6 && cleanUserPhone.length >= 6) {
+        const isMatch = cleanInputPhone === cleanUserPhone ||
+          cleanInputPhone.endsWith(cleanUserPhone.slice(-7)) ||
+          cleanUserPhone.endsWith(cleanInputPhone.slice(-7));
+        if (!isMatch) {
+          errText.textContent = 'Nomor WhatsApp / HP tidak cocok dengan data kontak akun Anda.';
+          errEl.classList.add('show');
+          return;
+        }
+      }
+
+      // Perbarui password di memori & localStorage
+      user.password = newPass;
+      saveMembers(members);
+
+      succText.textContent = `Kata sandi akun ${user.name} berhasil diperbarui! Mengalihkan ke login...`;
+      succEl.classList.add('show');
+      document.getElementById('forgotPassForm').reset();
+
+      setTimeout(() => {
+        showLoginForm();
+        if (user.role === 'admin') {
+          selectPortal('admin');
+          document.getElementById('adminId').value = user.id;
+          document.getElementById('adminPass').value = newPass;
+          document.getElementById('adminPass').focus();
+        } else {
+          selectPortal('member');
+          document.getElementById('memberId').value = user.id;
+          document.getElementById('memberPass').value = newPass;
+          document.getElementById('memberPass').focus();
+        }
+      }, 1500);
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const id = document.getElementById('regId').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const pass = document.getElementById('regPass').value.trim();
+      const regError = document.getElementById('regErrorMsg');
+      const regErrorText = document.getElementById('regErrorText');
+      const regSuccess = document.getElementById('regSuccessMsg');
+      const regSuccessText = document.getElementById('regSuccessText');
+
+      regError.classList.remove('show');
+      regSuccess.classList.remove('show');
+
+      if (!name || !id || !phone || !pass) {
+        regErrorText.textContent = 'Mohon lengkapi seluruh data pendaftaran.';
+        regError.classList.add('show');
+        return;
+      }
+
+      if (pass.length < 3) {
+        regErrorText.textContent = 'Kata sandi minimal 3 karakter.';
+        regError.classList.add('show');
+        return;
+      }
+
+      const members = getMembers();
+      if (findMember(id, members)) {
+        regErrorText.textContent = 'Nomor Anggota / NIM ini sudah terdaftar. Silakan langsung login di tab Anggota.';
+        regError.classList.add('show');
+        return;
+      }
+
+      // Tambahkan anggota baru
+      const newMember = {
+        id: id,
+        name: name,
+        role: "member",
+        phone: phone,
+        password: pass
+      };
+      members.push(newMember);
+      saveMembers(members);
+
+      regSuccessText.textContent = `Pendaftaran berhasil! Akun ${name} (${id}) siap digunakan. Mengalihkan ke login...`;
+      regSuccess.classList.add('show');
+      document.getElementById('registerForm').reset();
+
+      setTimeout(() => {
+        showLoginForm();
+        document.getElementById('memberId').value = id;
+        document.getElementById('memberPass').focus();
+      }, 1500);
+    }
+
+    // Inisialisasi awal anggota jika belum tersimpan
+    document.addEventListener('DOMContentLoaded', () => {
+      const members = getMembers();
+      if (!members || members.length === 0) {
+        saveMembers([...DEFAULT_MEMBERS]);
+      }
+    });
+  </script>
+</body>
+</html>

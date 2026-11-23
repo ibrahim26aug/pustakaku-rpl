@@ -1,0 +1,29 @@
+# Operating System Files
+Thumbs.db
+Desktop.ini
+.DS_Store
+ehthumbs.db
+
+# Editor & IDE Directories
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Microsoft Word & Office Temporary Lock Files
+~$*.docx
+~$*.doc
+~$*.pptx
+~$*.xlsx
+
+# Temporary & Log Files
+*.tmp
+*.bak
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Node modules (if any tool installed locally)
+node_modules/
+
