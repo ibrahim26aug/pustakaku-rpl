@@ -58,10 +58,7 @@ Layanan perpustakaan konvensional pada umumnya dibatasi oleh jam operasional lok
   * `pk_books`: Basis data inventaris koleksi buku & rak.
   * `pk_loans`: Catatan transaksi sirkulasi, status, tiket locker, dan denda.
   * `pk_current_member` & `pk_last_member`: Manajemen sesi autentikasi.
-* **Desain Perangkat Lunak (UML)**:
-  * File `USE CASE.drawio` (Diagram Use Case Aktor Member & Petugas).
-  * File `Class.drawio` (Class Diagram Entitas Anggota, Buku, Sirkulasi, dan Denda).
-  * File `UML SISTEM.drawio` (Activity & Sequence Diagram alur booking dan loker).
+* **Desain Perangkat Lunak & Alur Sistem**: Mengimplementasikan Use Case Sirkulasi Perpustakaan Modern, Class Model Entitas (Anggota, Koleksi Buku, Transaksi Pinjam, Smart Locker, dan Denda), serta Activity Flow Alur Booking Loker 24 Jam.
 
 ---
 
@@ -105,9 +102,6 @@ Aplikasi berbasis web murni (*client-side web application*) sehingga tidak memer
 ├── style.css           # Desain Antarmuka Responsif, Komponen UI, & Pengaturan Format Cetak Media Print
 ├── qr-locker.jpg       # Aset QR Code Mockup untuk Akses Smart Locker & Kasir QRIS
 ├── qrcode.jpeg         # Aset Visual Pendukung
-├── Class.drawio        # Diagram Kelas (UML Class Diagram)
-├── USE CASE.drawio     # Diagram Use Case Sistem Perpustakaan
-├── UML SISTEM.drawio   # Diagram Alur & Sekuensial Sistem
 ├── .gitignore          # Konfigurasi Pengecualian Berkas Repositori Git
 └── README.md           # Dokumentasi Akademik & Panduan Penggunaan Sistem
 ```
